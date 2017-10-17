@@ -1,4 +1,3 @@
-"use strict";
 
 // The central location for the Google Map
 const main_location = {lat: 1.3271906, lng: 103.8449238}; // Singapore
@@ -140,7 +139,7 @@ function Location(name, placeId, lat, lng, wikiPage=null, marker=null) {
     this.wikiPage = wikiPage;
     this.lat = lat;
     this.lng = lng;
-};
+}
 
 // Knockout view model for the Neighborhood Map application
 function MapViewModel() {
@@ -166,7 +165,7 @@ function MapViewModel() {
             let locs = ko.utils.arrayFilter(self.mapLocations, function (loc) {
                 return loc.name.toLowerCase().includes(self.locationFilter().toLowerCase());
             });
-            self.filteredLocations(locs)
+            self.filteredLocations(locs);
         }
         self.map.panTo(main_location);
         self.map.setZoom(12);  
@@ -185,20 +184,20 @@ function MapViewModel() {
             self.mapLocations[i].marker.setAnimation(null);
         }
 
-        for (var i=0; i < self.filteredLocations().length; i++) {
+        for (i=0; i < self.filteredLocations().length; i++) {
             self.filteredLocations()[i].marker.setMap(self.map);
         }
 
-    }
+    };
 
     // Update markers according to the updated selected location
     self.changeCurMarker = function(newLoc) {
-        if (self.curMarker != null) {
+        if (self.curMarker !== null) {
             self.curMarker.setIcon(blue_marker);
             self.curMarker.setAnimation(null);
         }
 
-        if (newLoc != null) {
+        if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
             self.curMarker = newLoc.marker;
             self.map.panTo(newLoc.marker.getPosition());
             newLoc.marker.setIcon(orange_marker);
@@ -206,13 +205,13 @@ function MapViewModel() {
         } else {
             self.curMarker = null;
         }
-    }
+    };
 
     // Do the necessary actions if the selected location changes
     self.selectedLocation.subscribe(function(newLoc) {
         self.changeCurMarker(newLoc);
 
-        if (newLoc != null) {
+        if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
             self.showDetailsInfoWindow(self.curMarker.mapLoc);
         } else {
             self.infoWindow.close();
@@ -229,7 +228,7 @@ function MapViewModel() {
 
         // Initialize filtered locations 
         self.filteredLocations(self.mapLocations);
-    }
+    };
 
     // Create a location and a map marker
     self.createMapLocation = function (loc) {
@@ -254,7 +253,7 @@ function MapViewModel() {
             self.selectedLocation(marker.mapLoc);
             self.showDetailsInfoWindow(marker.mapLoc);
         });
-    }
+    };
 
     // Request Google details info and open the Info window
     self.showDetailsInfoWindow = function(location) {
@@ -290,13 +289,13 @@ function MapViewModel() {
             );
         }
 
-    }
+    };
 
     // Open the Google Map info window with a predefined conent and marker
     self.showInfoWindow = function(content, marker) {
         self.infoWindow.setContent(content);
         self.infoWindow.open(self.map, marker);
-    }
+    };
 
     // Prepare the content of the Info Window
     self.prepareInfoWindowBody = function(placeId) {
@@ -310,7 +309,7 @@ function MapViewModel() {
         }
         
         let weekDay="";
-        if (self.detailsData[placeId].opening_hours != null) {
+        if ( typeof self.detailsData[placeId].opening_hours !== 'undefined') {
             let wd = self.detailsData[placeId].opening_hours.weekday_text;
 
             for (var i=0;i < wd.length; i++) {
@@ -322,7 +321,7 @@ function MapViewModel() {
                                            self.detailsData[placeId].formatted_address,
                                            phoneNum, weekDay);
 
-    }
+    };
 
     // Get Google Places user images for the selected location
     self.getGooglePlacesImages = function (placeId) {
@@ -339,7 +338,7 @@ function MapViewModel() {
         self.showModal(modalHeader.printf(self.selectedLocation().name,"Google Places user images"),
                             placesModalBodyBegin+output+placesModalBodyEnd);
 
-    }
+    };
 
     // Get Wikipedia data for a specific location
     self.getWikiPage = function() {
@@ -362,7 +361,7 @@ function MapViewModel() {
                 let pageKey = Object.keys(data.query.pages)[0];
 
                 // Extract the content and remove "gallery elements", which do not work anyway
-                let content = $("<div></div>").html(data.query.pages[pageKey]["extract"]);
+                let content = $("<div></div>").html(data.query.pages[pageKey].extract);
                 content.find('.gallerybox').remove();
                 content.find('.gallery').remove();
                 content.find( "[id*='gallery']" ).remove();
@@ -380,7 +379,7 @@ function MapViewModel() {
                 console.log(errMsg+": "+textStatus);
             }
         });
-    }
+    };
 
     // Get the related list of Foursquare venues
     self.getFoursquareInfo = function() {
@@ -432,7 +431,7 @@ function MapViewModel() {
             }
         });
 
-    }
+    };
 
     // Get Flickr images for the selected location
     self.getFlickrImages = function () {
@@ -495,14 +494,14 @@ function MapViewModel() {
                 console.log(errMsg+": "+textStatus);
             }
         });
-    }
+    };
 
     // Show a modal window with specified content
     self.showModal = function (header,body) {
         $('#info-lab').html(header);
         $('#info-content').html(body);
         $('#info-modal').modal('show');
-    }
+    };
 
 
     // Initialize the Google Map object and locations
@@ -517,7 +516,7 @@ function MapViewModel() {
         self.initPlaces();
         $( "#loc-filter" ).focus();
         console.log("* Map created");
-    }
+    };
 }
 
 // Initialize the application Knockout model
