@@ -407,7 +407,7 @@ function MapViewModel() {
             cache: false,
             url: fsqUrl,
             success: function(result, textStatus, jqXHR){
-                let data = result.response.groups[0].items
+                let data = result.response.groups[0].items;
                 
                 let content="";
                 $.each(data, function(index){
@@ -420,7 +420,7 @@ function MapViewModel() {
                                                     data[index].venue.categories[0].icon.suffix);
 
                     content += fsqModalBody.printf(data[index].venue.id,iconUrl,name);
-                })
+                });
 
                 // Activate the modal window with results
                 self.showModal(modalHeader.printf(self.selectedLocation().name,"Foursquare Venues in this area"),
