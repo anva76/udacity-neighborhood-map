@@ -1,4 +1,7 @@
 
+/*global ko*/
+/*global google*/
+
 // The central location for the Google Map
 const main_location = {lat: 1.3271906, lng: 103.8449238}; // Singapore
 
