@@ -8,11 +8,6 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/main.css">
 
-  <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-  <script type='text/javascript' src='js/knockout-3.4.2.js'></script>
-  <script type='text/javascript' src='js/printf.js'></script>
-
   <title>Singapore Tourist Attractons</title>
 </head>
 <body>
@@ -23,12 +18,12 @@
       </div>
    </header>
 
-   <section class="row">
-      <div class="col-md-3 margin-bottom-10 margin-top-5">
+   <section class="row" >
+      <div class="col-md-3 margin-bottom-10 margin-top-5" id="left-group">
           <div class="input-group">
-            <input class="form-control" type="text" id="loc-filter" data-bind="value: locationFilter, valueUpdate: 'keyup'" autocomplete="off" >
+            <input class="form-control" type="text" id="loc-filter" data-bind="value: locationFilter, valueUpdate: 'keyup', hasFocus: true" autocomplete="off" >
             <div class="input-group-addon">
-              <span class="glyphicon glyphicon-filter"></span> 
+              <span class="glyphicon glyphicon-filter"></span>
             </div>
           </div>
           <select class="form-control" id="location-list" size="12" data-bind="options: filteredLocations, value: selectedLocation, optionsText:'name'"></select>
@@ -39,24 +34,93 @@
    </section>
   </div>
 
-     <!-- Modal Window -->
-  <div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="info-lab">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" id="info-lab"></h4>
-        </div>
-        <div class="modal-body pre-scrollable margin-left-5" id="info-content">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
-        </div>
+  <!-- Modal Window -->
+  <div class="modal fade" id="info-modal2" tabindex="-1" role="dialog" aria-labelledby="info-lab2">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content" data-bind="template: {name : templateName, data: viewModel.modalWindow}"></div>
       </div>
-    </div>
   </div>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDO5IcLEduV_P0Pm5ZcuFnDd_GIsMKBfig&libraries=places&language=en&callback=viewModel.initMap"></script>
+  <!-- Google Map Info Window Knockout template -->
+     <script type="text/html" id="info-window-template">
+       <div class='info-header' data-bind="html: infoHeader"></div>
+       <div class='info-sub-header margin-bottom-5' data-bind="html: infoSubHeader"></div>
+       <p data-bind="html: infoContent"></p>
+       <hr/>
+       <button type='button' class='btn btn-default btn-sm' data-bind='click: viewModel.getFoursquareInfo'>Foursquare</button>
+       <button type='button' class='btn btn-default btn-sm' data-bind='click: viewModel.getGooglePlacesImages'>Google Places</button>
+       <button type='button' class='btn btn-default btn-sm' data-bind='click: viewModel.getWikiPage'>Wikipedia</button>
+       <button type='button' class='btn btn-default btn-sm' data-bind='click: viewModel.getFlickrImages'>Flickr</button>
+     </script>
+
+  <!-- Modal Window Knockout template #1 (Google places, Flickr) -->
+     <script type="text/html" id="modal-window-images-template">
+       <div class="modal-header">
+         <div class="modal-title" id="info-lab">
+           <div class="info-header" data-bind="text: modalHeader" ></div>
+           <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
+         </div>
+       </div>
+       <div class="modal-body pre-scrollable margin-left-5" id="info-content" data-bind="foreach: modalContentRows">
+         <div class="col-md-12 places-img">
+          <a href="" target="_blank" data-bind="attr: { href: extUrl}">
+           <img src="" width='460' data-bind="attr: { src: imgUrl}">
+           <h5 data-bind="text: imgTitle"></h5>
+          </a>
+         </div>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+       </div>
+     </script>
+
+  <!-- Modal Window Knockout template #2 (Foursquare) -->
+     <script type="text/html" id="modal-window-icons-template">
+       <div class="modal-header">
+         <div class="modal-title" id="info-lab">
+           <div class="info-header" data-bind="text: modalHeader" ></div>
+           <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
+         </div>
+       </div>
+       <div class="modal-body pre-scrollable margin-left-5" id="info-content" data-bind="foreach: modalContentRows">
+         <div class="col-md-4">
+          <a href="" target="_blank" data-bind="attr: { href: extUrl}">
+          <img class='info-icon' src="" width='64' height='64' data-bind="attr: { src: imgUrl}">
+          <h5 data-bind="text: imgTitle"></h5>
+          </a>
+         </div>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+       </div>
+     </script>
+  <!-- ********************************************** -->
+
+  <!-- Modal Window Knockout template #3 (Wikipedia) -->
+     <script type="text/html" id="modal-window-text-template">
+       <div class="modal-header">
+         <div class="modal-title" id="info-lab">
+           <div class="info-header" data-bind="text: modalHeader" ></div>
+           <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
+         </div>
+       </div>
+       <div class="modal-body pre-scrollable margin-left-5" id="info-content">
+          <div class='info-text' data-bind="html: modalContent"></div>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+       </div>
+     </script>
+  <!-- ********************************************** -->
+
+  <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type='text/javascript' src='js/knockout-3.4.2.js'></script>
+  <script type='text/javascript' src='js/printf.js'></script>
+
   <script type="text/javascript" src="js/app.js"></script>
+  <script async defer onerror="mapOnError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDO5IcLEduV_P0Pm5ZcuFnDd_GIsMKBfig&libraries=places&language=en&callback=viewModel.initMap" ></script>
+
 
 </body>
 </html>
