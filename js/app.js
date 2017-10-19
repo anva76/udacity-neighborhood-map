@@ -3,136 +3,64 @@
 /*global google*/
 
 // The central location for the Google Map
-const main_location = {lat: 1.3271906, lng: 103.8449238}; // Singapore
+const MAIN_LOCATION = {lat: 1.3271906, lng: 103.8449238}; // Singapore
 
-// Custom map markers 
-const blue_marker = "images/blue_marker.png";
-const orange_marker = "images/orange_marker.png";
+// Custom map markers
+const BLUE_MARKER = "images/blue_marker.png";
+const ORANGE_MARKER = "images/orange_marker.png";
 
 // Initial data for map locations
 // *****************************************************************************************
-const locations = [
-  
+const LOCATIONS = [
+
  { name: 'National Museum', lat: 1.2966375, lng: 103.8486646, wikiPage: "National_Museum_of_Singapore",
-    gPlaceId: 'ChIJD1u-EaMZ2jERaLhNfFkR45I' },  
-    
-   
+    gPlaceId: 'ChIJD1u-EaMZ2jERaLhNfFkR45I' },
+
+
  { name: 'Singapore Zoo', lat: 1.4043485, lng: 103.79302299999995, wikiPage: "Singapore_Zoo",
-    gPlaceId: 'ChIJr9wqENkT2jERkRs7pMj6FLQ' },  
-    
-   
+    gPlaceId: 'ChIJr9wqENkT2jERkRs7pMj6FLQ' },
+
+
  { name: 'Gardens by the Bay', lat: 1.2815683, lng: 103.86361320000003, wikiPage: "Gardens_by_the_Bay",
-    gPlaceId: 'ChIJMxZ-kwQZ2jERdsqftXeWCWI' },  
-    
-   
+    gPlaceId: 'ChIJMxZ-kwQZ2jERdsqftXeWCWI' },
+
+
  { name: 'Singapore Flyer', lat: 1.2892988, lng: 103.8631368, wikiPage: "Singapore_Flyer",
-    gPlaceId: 'ChIJzVHFNqkZ2jERboLN2YrltH8' },  
-    
-   
+    gPlaceId: 'ChIJzVHFNqkZ2jERboLN2YrltH8' },
+
+
  { name: 'Sentosa', lat: 1.2494041, lng: 103.83032090000006, wikiPage: "Sentosa",
-    gPlaceId: 'ChIJRYMSeKwe2jERAR2QXVU39vg' },  
-    
-   
+    gPlaceId: 'ChIJRYMSeKwe2jERAR2QXVU39vg' },
+
+
  { name: 'Marina Bay', lat: 1.283949, lng: 103.85884599999997, wikiPage: "Marina_Bay,_Singapore",
-    gPlaceId: 'ChIJ63Hk2AUZ2jERWTUPLfbWx4I' },  
-    
-   
+    gPlaceId: 'ChIJ63Hk2AUZ2jERWTUPLfbWx4I' },
+
+
  { name: 'Raffles Hotel', lat: 1.2948829, lng: 103.85447909999993, wikiPage: "Raffles_Hotel",
-    gPlaceId: 'ChIJwUTKu6UZ2jERwt5ctkU4f2Q' },  
-    
-   
+    gPlaceId: 'ChIJwUTKu6UZ2jERwt5ctkU4f2Q' },
+
+
  { name: 'Clarke Quay', lat: 1.2906024, lng: 103.84647419999999, wikiPage: "Clarke_Quay",
-    gPlaceId: 'ChIJnXwAOKAZ2jERAs-MHs1aDgI' },  
-    
-   
- { name: 'Universal Studios Singapore', lat: 1.2540421, lng: 103.82380839999996, 
+    gPlaceId: 'ChIJnXwAOKAZ2jERAs-MHs1aDgI' },
+
+
+ { name: 'Universal Studios Singapore', lat: 1.2540421, lng: 103.82380839999996,
     wikiPage: "Universal_Studios_Singapore",
-    gPlaceId: 'ChIJQ6MVplUZ2jERn1LmNH0DlDA' },  
-    
-   
- { name: 'Buddha Tooth Relic Temple and Museum', lat: 1.2813993, lng: 103.84426840000003, 
+    gPlaceId: 'ChIJQ6MVplUZ2jERn1LmNH0DlDA' },
+
+
+ { name: 'Buddha Tooth Relic Temple and Museum', lat: 1.2813993, lng: 103.84426840000003,
     wikiPage: "Buddha_Tooth_Relic_Temple_and_Museum",
-    gPlaceId: 'ChIJ0bwmznIZ2jEREOCMNggtIBk' } 
+    gPlaceId: 'ChIJ0bwmznIZ2jEREOCMNggtIBk' }
 ];
 // **************************************************************************************************
 
-// Some html templates for the modal and info windows
-// ******************************************************************************************************
-let modalHeader =`
-<div class='info-header'>{0}</div>
-<div class='sub-info-header'>{1}</div>
-`;
-
-let wikiModalBody = `
-<div class='info-text'>{0}</div>
-`;
-
-let fsqModalBodyBegin=`
-<div class='row'>
-`;
-
-let fsqModalBody =`
-<div class="col-md-4">
- <a href='https://foursquare.com/v/{0}' target="_blank">
- <img class='info-icon' src='{1}' width='64' height='64'>
- <h5>{2}</h5>
- </a>
-</div>
-`;
-
-let fsqModalBodyEnd=`
-</div>
-`;
-
-let placesModalBodyBegin=`
-<div class='row'>
-`;
-
-let placesModalBody=`
-<div class="col-md-12 places-img">
-<a href='{0}' target="_blank">
-  <img src='{1}' width='460'>
-</a>
-</div>
-`;
-
-let placesModalBodyEnd=`
-</div>
-`;
-
-let flrModalBodyBegin=`
-<div class='row'>
-`;
-
-let flrModalBody=`
-<div class="col-md-12 places-img">
- <a href='{0}' target="_blank">
-  <img src='{1}' width='460'>
-  <h5>{2}</h5>
- </a>
-</div>
-`;
-
-let flrModalBodyEnd=`
-</div>
-`;
-
-let infoWindowBody=`
-<div class='info-header'>{0}</div>
-<div class='sub-info-header margin-bottom-5'>{1}<br/>{2}</div>
-<p>{3}</p>
-<hr/>
-<button type='button' class='btn btn-default btn-sm' onclick='viewModel.getFoursquareInfo()'>Foursquare</button>
-<button type='button' class='btn btn-default btn-sm' onclick='viewModel.getGooglePlacesImages(viewModel.selectedLocation().placeId)'>Google Places</button>
-<button type='button' class='btn btn-default btn-sm' onclick='viewModel.getWikiPage()'>Wikipedia</button>
-<button type='button' class='btn btn-default btn-sm' onclick='viewModel.getFlickrImages()'>Flickr</button>
+// Info Window HTML content
+let infoWindowHTML=`
+<div id="info-window" data-bind="template: { name: 'info-window-template', data: viewModel.infoWindow }"></div>
 `;
 // *****************************************************************************************
-
-// Scroll the content to the top when the modal opens
-$('#info-modal').on('shown.bs.modal', function () {
-    $('#info-content').scrollTop(0);
-});
 
 // Map location data model
 function Location(name, placeId, lat, lng, wikiPage=null, marker=null) {
@@ -144,6 +72,68 @@ function Location(name, placeId, lat, lng, wikiPage=null, marker=null) {
     this.lng = lng;
 }
 
+// Info Window view model
+function InfoWindowViewModel() {
+    var self = this;
+
+    self.infoHeader = ko.observable("");
+    self.infoSubHeader = ko.observable("");
+    self.infoContent = ko.observableArray("");
+
+    // Initialize the Info Window instance
+    self.init = function () {
+        self.infoWindow = new google.maps.InfoWindow({
+            content: infoWindowHTML
+        });
+        var isInfoWindowLoaded = false;
+
+        google.maps.event.addListener(self.infoWindow, 'domready', function () {
+            if (!isInfoWindowLoaded) {
+                ko.applyBindings(self, $("#info-window")[0]);
+                isInfoWindowLoaded = true;
+           }
+        });
+    };
+
+    self.close = function () {
+        self.infoWindow.close();
+    };
+
+    self.open = function(map,marker) {
+
+        self.infoWindow.open(map,marker);
+    };
+
+}
+
+// **********************************************************************
+// Modal Window view model
+function ModalWindowViewModel() {
+    var self = this;
+
+    self.modalHeader = ko.observable("");
+    self.modalSubHeader = ko.observable("");
+    self.modalContent =  ko.observable("");
+    self.modalContentRows = ko.observableArray([]);
+    self.templateName = ko.observable();
+
+    self.showModal = function() {
+       $('#info-modal2').modal('show');
+    };
+
+    self.init = function () {
+      // Scrolling the content to the top when the modal opens
+      $('#info-modal2').on('shown.bs.modal', function () {
+          $('#info-content').scrollTop(0);
+      });
+
+      ko.applyBindings(self, $("#info-modal2")[0]);
+    };
+
+}
+
+// **********************************************************************
+
 // Knockout view model for the Neighborhood Map application
 function MapViewModel() {
     var self = this;
@@ -154,9 +144,17 @@ function MapViewModel() {
 
     self.selectedLocation = ko.observable();
     self.locationFilter = ko.observable();
-
     self.filteredLocations = ko.observableArray();
-        
+
+    self.modalHeader = ko.observable("");
+    self.modalContent = ko.observable("");
+
+    // Info Window view object
+    self.infoWindow = new InfoWindowViewModel();
+
+    // Modal Window view object
+    self.modalWindow = new ModalWindowViewModel();
+
     // Do the necessary actions if the filter field changes
     self.locationFilter.subscribe(function(newFilter) {
 
@@ -170,11 +168,11 @@ function MapViewModel() {
             });
             self.filteredLocations(locs);
         }
-        self.map.panTo(main_location);
-        self.map.setZoom(12);  
+        self.map.panTo(MAIN_LOCATION);
+        self.map.setZoom(12);
         self.selectedLocation(null);
         self.updateMarkers();
-      
+
     }, self);
 
     // Update markers according to the search filter
@@ -183,7 +181,7 @@ function MapViewModel() {
         self.infoWindow.close();
         for (var i=0; i < self.mapLocations.length; i++) {
             self.mapLocations[i].marker.setMap(null);
-            self.mapLocations[i].marker.setIcon(blue_marker);
+            self.mapLocations[i].marker.setIcon(BLUE_MARKER);
             self.mapLocations[i].marker.setAnimation(null);
         }
 
@@ -196,14 +194,14 @@ function MapViewModel() {
     // Update markers according to the updated selected location
     self.changeCurMarker = function(newLoc) {
         if (self.curMarker !== null) {
-            self.curMarker.setIcon(blue_marker);
+            self.curMarker.setIcon(BLUE_MARKER);
             self.curMarker.setAnimation(null);
         }
 
         if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
             self.curMarker = newLoc.marker;
             self.map.panTo(newLoc.marker.getPosition());
-            newLoc.marker.setIcon(orange_marker);
+            newLoc.marker.setIcon(ORANGE_MARKER);
             newLoc.marker.setAnimation(google.maps.Animation.BOUNCE);
         } else {
             self.curMarker = null;
@@ -215,7 +213,8 @@ function MapViewModel() {
         self.changeCurMarker(newLoc);
 
         if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
-            self.showDetailsInfoWindow(self.curMarker.mapLoc);
+
+            self.getDetailsAndShowInfo(newLoc);
         } else {
             self.infoWindow.close();
         }
@@ -225,11 +224,11 @@ function MapViewModel() {
     // Initialize map locations
     self.initPlaces = function (){
 
-        for (var i = 0; i < locations.length; i++) {
-            self.createMapLocation(locations[i]);
+        for (var i = 0; i < LOCATIONS.length; i++) {
+            self.createMapLocation(LOCATIONS[i]);
         }
 
-        // Initialize filtered locations 
+        // Initialize filtered locations
         self.filteredLocations(self.mapLocations);
     };
 
@@ -240,11 +239,11 @@ function MapViewModel() {
         let marker = new google.maps.Marker({
           map: self.map,
           position: placeLoc,
-          icon: blue_marker,
+          icon: BLUE_MARKER,
           title: loc.name
         });
 
-        let mapLocation = new Location (loc.name, loc.gPlaceId, loc.lat, loc.lng, 
+        let mapLocation = new Location (loc.name, loc.gPlaceId, loc.lat, loc.lng,
                                     loc.wikiPage, marker);
 
         marker.mapLoc = mapLocation;
@@ -254,39 +253,41 @@ function MapViewModel() {
         google.maps.event.addListener(marker, 'click', function() {
 
             self.selectedLocation(marker.mapLoc);
-            self.showDetailsInfoWindow(marker.mapLoc);
+            //self.getDetailsAndShowInfo(marker.mapLoc);
         });
     };
 
     // Request Google details info and open the Info window
-    self.showDetailsInfoWindow = function(location) {
+    self.getDetailsAndShowInfo = function(location) {
 
         // Check if Google places data is already present
         if ( location.placeId in self.detailsData) {
             // Open the Info Window
-            self.showInfoWindow(self.prepareInfoWindowBody(location.placeId), location.marker);
-                
+            self.showInfoWindow(location.marker);
+            self.updateInfoWindowBody(location.placeId);
+
         } else {
 
             let request = { placeId: location.placeId};
             // Get the corresponding Google places data
-            self.service.getDetails(request, 
+            self.service.getDetails(request,
               function (place, status) {
 
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
 
                     // Save the place details
-                    let placeId = place.place_id;    
+                    let placeId = place.place_id;
                     self.detailsData[placeId] = place;
                     console.log("Google Places info received successfully");
-                    
+
                     // Open the Info Window
-                    self.showInfoWindow(self.prepareInfoWindowBody(placeId), location.marker);
+                    self.showInfoWindow(location.marker);
+                    self.updateInfoWindowBody(placeId);
                 } else {
 
                     let errMsg = "Failed to load Google Places info";
                     alert(errMsg);
-                    console.log(errMsg);
+                    console.log(errMsg+": "+ place.error_message);
                 }
               }
             );
@@ -294,52 +295,29 @@ function MapViewModel() {
 
     };
 
-    // Open the Google Map info window with a predefined conent and marker
-    self.showInfoWindow = function(content, marker) {
-        self.infoWindow.setContent(content);
-        self.infoWindow.open(self.map, marker);
-    };
-
-    // Prepare the content of the Info Window
-    self.prepareInfoWindowBody = function(placeId) {
-
-        let phoneNum = self.detailsData[placeId].international_phone_number;
-
-        if (!phoneNum) {
-            phoneNum = "";
-        } else {
-            phoneNum = "Tel: "+phoneNum;
-        }
-        
-        let weekDay="";
-        if ( typeof self.detailsData[placeId].opening_hours !== 'undefined') {
-            let wd = self.detailsData[placeId].opening_hours.weekday_text;
-
-            for (var i=0;i < wd.length; i++) {
-                weekDay += wd[i]+"<br/>";
-            }
-        }
-
-        return infoWindowBody.printf(self.detailsData[placeId].name, 
-                                           self.detailsData[placeId].formatted_address,
-                                           phoneNum, weekDay);
-
-    };
 
     // Get Google Places user images for the selected location
-    self.getGooglePlacesImages = function (placeId) {
-        let imgUrl, imgUrl2;
+    self.getGooglePlacesImages = function () {
+
+        let placeId = self.selectedLocation().placeId;
+
+        let imgUrl, extUrl;
         let len = self.detailsData[placeId].photos.length;
-        
-        let output = "";
+
+        let contentRows = [];
         for (var i=0; i < len; i++ ) {
             imgUrl = self.detailsData[placeId].photos[i].getUrl({'maxWidth': 500, 'maxHeight': 500});
-            imgUrl2 = self.detailsData[placeId].photos[i].getUrl({'maxWidth': 1600, 'maxHeight': 1600});
-            output += placesModalBody.printf(imgUrl2,imgUrl);
+            extUrl = self.detailsData[placeId].photos[i].getUrl({'maxWidth': 1600, 'maxHeight': 1600});
+            contentRows.push({imgUrl: imgUrl, extUrl: extUrl, imgTitle: "" });
         }
         // Activate the modal window with the results
-        self.showModal(modalHeader.printf(self.selectedLocation().name,"Google Places user images"),
-                            placesModalBodyBegin+output+placesModalBodyEnd);
+        self.modalWindow.modalContentRows([]);
+
+        self.modalWindow.templateName("modal-window-images-template");
+        self.modalWindow.modalHeader(self.selectedLocation().name);
+        self.modalWindow.modalSubHeader("Google Places user images");
+        self.modalWindow.modalContentRows(contentRows);
+        self.modalWindow.showModal();
 
     };
 
@@ -362,20 +340,19 @@ function MapViewModel() {
             success: function (data, textStatus, jqXHR) {
 
                 let pageKey = Object.keys(data.query.pages)[0];
-
-                // Extract the content and remove "gallery elements", which do not work anyway
-                let content = $("<div></div>").html(data.query.pages[pageKey].extract);
-                content.find('.gallerybox').remove();
-                content.find('.gallery').remove();
-                content.find( "[id*='gallery']" ).remove();
-                content.find( "[id*='Gallery']" ).remove();
+                let content = data.query.pages[pageKey].extract;
 
                 // Activate the modal window with the content
-                self.showModal(modalHeader.printf(self.selectedLocation().name,"Wikipedia article"),
-                                wikiModalBody.printf(content.html()));
+                self.modalWindow.modalContentRows([]);
+
+                self.modalWindow.templateName("modal-window-text-template");
+                self.modalWindow.modalHeader(self.selectedLocation().name);
+                self.modalWindow.modalSubHeader("Wikipedia article");
+                self.modalWindow.modalContent(content);
+                self.modalWindow.showModal();
 
             },
-            
+
             error: function (jqXHR, textStatus, errorThrown) {
                 let errMsg = "Failed to load Wikipedia data";
                 alert(errMsg);
@@ -390,14 +367,14 @@ function MapViewModel() {
         // Foursuare credentials for making json requests
         let fsqClientId = "PY3F5WM2VU1YE55GJRB3NAWPUF5BLJCM1AA1ZMF2CHLMYDLT";
         let fsqClientSec = "JXYRM44BDVXGGXDAVKE3MQ5AJSYL5R0DVZBED5KSDTRGQ54J";
-        
+
         let lat = self.selectedLocation().lat;
         let lng = self.selectedLocation().lng;
 
         // Prepare a url for an ajax request
         let tempUrl = "https://api.foursquare.com/v2/venues/explore?ll={0},{1}&limit=24&client_id={2}&client_secret={3}&v=20171001";
         let fsqUrl = tempUrl.printf(lat,lng,fsqClientId,fsqClientSec);
-  
+
         // Perform an ajax request to obtain venue data from Foursquare
         $.ajax({
             type: "GET",
@@ -408,23 +385,31 @@ function MapViewModel() {
             url: fsqUrl,
             success: function(result, textStatus, jqXHR){
                 let data = result.response.groups[0].items;
-                
-                let content="";
+
+                let contentRows = [];
+
                 $.each(data, function(index){
-        
-                    let url = data[index].venue.url;
+
                     let name = data[index].venue.name;
                     if (name.length > 20) name = name.substring(0,18)+"...";
 
                     let iconUrl = '{0}64{1}'.printf(data[index].venue.categories[0].icon.prefix,
                                                     data[index].venue.categories[0].icon.suffix);
 
-                    content += fsqModalBody.printf(data[index].venue.id,iconUrl,name);
+                    let extUrl = "https://foursquare.com/v/"+data[index].venue.id;
+
+                    contentRows.push({imgUrl: iconUrl, extUrl: extUrl, imgTitle: name});
+
                 });
 
                 // Activate the modal window with results
-                self.showModal(modalHeader.printf(self.selectedLocation().name,"Foursquare Venues in this area"),
-                                fsqModalBodyBegin+content+fsqModalBodyEnd);
+                self.modalWindow.modalContentRows([]);
+
+                self.modalWindow.templateName("modal-window-icons-template");
+                self.modalWindow.modalHeader(self.selectedLocation().name);
+                self.modalWindow.modalSubHeader("Foursquare Venues in this area");
+                self.modalWindow.modalContentRows(contentRows);
+                self.modalWindow.showModal();
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -440,10 +425,6 @@ function MapViewModel() {
     self.getFlickrImages = function () {
 
         let tempUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=f05ce2432c3d3adc2d403eaf67d5d8bd&per_page=30&lat={0}&lon={1}&radius=2&media=photos&format=json&text={2}&jsoncallback=?";
-
-        // Flickr credentials for json requests
-        let flrKey = "f05ce2432c3d3adc2d403eaf67d5d8bd";
-        let flrSecret = "d429d1371fddae36";
 
         let lat = self.selectedLocation().lat;
         let lng = self.selectedLocation().lng;
@@ -462,13 +443,13 @@ function MapViewModel() {
             url: flickrUrl,
 
             success: function(data, textStatus, jqXHR){
-                let output = "";
 
+                let contentRows = [];
                 for (var i=0;i< data.photos.photo.length;i++) {
 
                     // Prepare a Flickr image url
                     let tempUrl = "https://farm{0}.staticflickr.com/{1}/{2}_{3}_z.jpg";
-                    let fImgUrl = tempUrl.printf(data.photos.photo[i].farm,
+                    let imgUrl = tempUrl.printf(data.photos.photo[i].farm,
                                                     data.photos.photo[i].server,
                                                     data.photos.photo[i].id,
                                                     data.photos.photo[i].secret );
@@ -476,19 +457,26 @@ function MapViewModel() {
 
                     // Prepare a url for the corresponding Flickr image page
                     tempUrl = "https://www.flickr.com/photos/{0}/{1}";
-                    let fPageUrl = tempUrl.printf(data.photos.photo[i].owner,
+                    let extUrl = tempUrl.printf(data.photos.photo[i].owner,
                                                 data.photos.photo[i].id);
 
                     let title = data.photos.photo[i].title;
                     if (title.length > 42) title = title.substring(0,40)+" ...";
 
                     // Add data to the output
-                    output += flrModalBody.printf(fPageUrl,fImgUrl,title);
+                    contentRows.push({ imgUrl: imgUrl, extUrl: extUrl, imgTitle: title });
+
                 }
 
                 // Activate the modal window with results
-                self.showModal(modalHeader.printf(self.selectedLocation().name,"Flickr images"),
-                                flrModalBodyBegin+output+flrModalBodyEnd);
+                self.modalWindow.modalContentRows([]);
+
+                self.modalWindow.templateName("modal-window-images-template");
+                self.modalWindow.modalHeader(self.selectedLocation().name);
+                self.modalWindow.modalSubHeader("Flickr images");
+                self.modalWindow.modalContentRows(contentRows);
+                self.modalWindow.showModal();
+
             },
 
             error: function (jqXHR, textStatus, errorThrown) {
@@ -499,29 +487,63 @@ function MapViewModel() {
         });
     };
 
-    // Show a modal window with specified content
-    self.showModal = function (header,body) {
-        $('#info-lab').html(header);
-        $('#info-content').html(body);
-        $('#info-modal').modal('show');
+    // Open the Google Map info window with a predefined conent and marker
+    self.showInfoWindow = function(marker) {
+        self.infoWindow.open(self.map, marker);
     };
 
+    // Prepare the content of the Info Window
+    self.updateInfoWindowBody = function(placeId) {
+
+        let phoneNum = self.detailsData[placeId].international_phone_number;
+
+        if (!phoneNum) {
+            phoneNum = "";
+        } else {
+            phoneNum = "Tel: "+phoneNum;
+        }
+
+        let weekDay="";
+        if ( typeof self.detailsData[placeId].opening_hours !== 'undefined') {
+            let wd = self.detailsData[placeId].opening_hours.weekday_text;
+
+            for (var i=0;i < wd.length; i++) {
+                            weekDay += wd[i]+"<br/>";
+            }
+        }
+
+        let address = self.detailsData[placeId].formatted_address;
+        if (!address) {
+            address = "";
+        }
+
+        self.infoWindow.infoHeader(self.detailsData[placeId].name);
+        self.infoWindow.infoSubHeader(address+"<br/>"+phoneNum);
+        self.infoWindow.infoContent(weekDay);
+    };
 
     // Initialize the Google Map object and locations
     self.initMap = function() {
         self.map = new google.maps.Map(document.getElementById('map'), {
-             center: main_location,
+             center: MAIN_LOCATION,
              zoom: 12
             });
 
         self.service = new google.maps.places.PlacesService(self.map);
-        self.infoWindow = new google.maps.InfoWindow();
+
         self.initPlaces();
-        $( "#loc-filter" ).focus();
-        console.log("* Map created");
+        self.infoWindow.init();
+        self.modalWindow.init();
+        console.log("=> Map created");
     };
+}
+// *******************************************************************************************
+function mapOnError() {
+    let msg = "Failed to load Google MAP API";
+    alert(msg);
+    console.log(msg);
 }
 
 // Initialize the application Knockout model
 var viewModel = new MapViewModel();
-ko.applyBindings(viewModel);
+ko.applyBindings(viewModel,$("#left-group")[0]);
