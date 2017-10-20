@@ -8,27 +8,29 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/main.css">
 
-  <title>Singapore Tourist Attractons</title>
+  <title>Singapore Locations</title>
 </head>
 <body>
-  <div class="container-fluid">
+  <div class="container-fluid" >
     <header class="row app-header">
-      <div class="col-md-12">
-        <h1 class="text-left text-uppercase header-font">Singapore Tourist Attractons</h1>
+      <div class="col-sm-12">
+        <div class="text-left header-font" id="app-header-main" data-bind="text: appName"></div>
       </div>
    </header>
 
    <section class="row" >
-      <div class="col-md-3 margin-bottom-10 margin-top-5" id="left-group">
+      <div class="col-sm-3 margin-bottom-10 margin-top-5" id="left-group" >
           <div class="input-group">
-            <input class="form-control" type="text" id="loc-filter" data-bind="value: locationFilter, valueUpdate: 'keyup', hasFocus: true" autocomplete="off" >
+            <input class="form-control" type="text" placeholder="Search" id="loc-filter" data-bind="value: locationFilter, valueUpdate: 'keyup', hasFocus: true" autocomplete="off" >
             <div class="input-group-addon">
               <span class="glyphicon glyphicon-filter"></span>
             </div>
           </div>
-          <select class="form-control" id="location-list" size="12" data-bind="options: filteredLocations, value: selectedLocation, optionsText:'name'"></select>
+          <ul class="list-group location-list" id="loc-list" data-bind="foreach: filteredLocations">
+            <li class="location-item" data-bind="text: name, click: viewModel.listClick, css: {'location-item-selected': $data === $parent.selectedLocation()}"></li>
+          </ul>
       </div>
-      <div class="col-md-9">
+      <div class="col-sm-9">
         <div id="map" ></div>
      </div>
    </section>
@@ -37,7 +39,7 @@
   <!-- Modal Window -->
   <div class="modal fade" id="info-modal2" tabindex="-1" role="dialog" aria-labelledby="info-lab2">
       <div class="modal-dialog modal-md">
-        <div class="modal-content" data-bind="template: {name : templateName, data: viewModel.modalWindow}"></div>
+        <div class="modal-content" data-bind="template: {name : templateName, data: viewModel}"></div>
       </div>
   </div>
 
@@ -57,41 +59,38 @@
      <script type="text/html" id="modal-window-images-template">
        <div class="modal-header">
          <div class="modal-title" id="info-lab">
+           <button type="button" class="close close-button" data-dismiss="modal">x</button>
            <div class="info-header" data-bind="text: modalHeader" ></div>
            <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
+
          </div>
        </div>
        <div class="modal-body pre-scrollable margin-left-5" id="info-content" data-bind="foreach: modalContentRows">
-         <div class="col-md-12 places-img">
+         <div class="col-sm-12 places-img">
           <a href="" target="_blank" data-bind="attr: { href: extUrl}">
-           <img src="" width='460' data-bind="attr: { src: imgUrl}">
+           <img class="img-responsive" src="" width='460' data-bind="attr: { src: imgUrl}">
            <h5 data-bind="text: imgTitle"></h5>
           </a>
          </div>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
        </div>
      </script>
 
   <!-- Modal Window Knockout template #2 (Foursquare) -->
      <script type="text/html" id="modal-window-icons-template">
        <div class="modal-header">
+         <button type="button" class="close close-button" data-dismiss="modal">x</button>
          <div class="modal-title" id="info-lab">
            <div class="info-header" data-bind="text: modalHeader" ></div>
            <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
          </div>
        </div>
        <div class="modal-body pre-scrollable margin-left-5" id="info-content" data-bind="foreach: modalContentRows">
-         <div class="col-md-4">
+         <div class="col-sm-4">
           <a href="" target="_blank" data-bind="attr: { href: extUrl}">
           <img class='info-icon' src="" width='64' height='64' data-bind="attr: { src: imgUrl}">
           <h5 data-bind="text: imgTitle"></h5>
           </a>
          </div>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
        </div>
      </script>
   <!-- ********************************************** -->
@@ -99,6 +98,7 @@
   <!-- Modal Window Knockout template #3 (Wikipedia) -->
      <script type="text/html" id="modal-window-text-template">
        <div class="modal-header">
+         <button type="button" class="close close-button" data-dismiss="modal">x</button>
          <div class="modal-title" id="info-lab">
            <div class="info-header" data-bind="text: modalHeader" ></div>
            <div class="info-sub-header" data-bind="text: modalSubHeader"></div>
@@ -106,9 +106,6 @@
        </div>
        <div class="modal-body pre-scrollable margin-left-5" id="info-content">
           <div class='info-text' data-bind="html: modalContent"></div>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
        </div>
      </script>
   <!-- ********************************************** -->
