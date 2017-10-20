@@ -9,6 +9,9 @@ const MAIN_LOCATION = {lat: 1.3271906, lng: 103.8449238}; // Singapore
 const BLUE_MARKER = "images/blue_marker.png";
 const ORANGE_MARKER = "images/orange_marker.png";
 
+const LONG_APP_NAME = "Singapore Locations";
+const SHORT_APP_NAME = "Singapore";
+
 // Initial data for map locations
 // *****************************************************************************************
 const LOCATIONS = [
@@ -107,53 +110,43 @@ function InfoWindowViewModel() {
 }
 
 // **********************************************************************
-// Modal Window view model
-function ModalWindowViewModel() {
-    var self = this;
-
-    self.modalHeader = ko.observable("");
-    self.modalSubHeader = ko.observable("");
-    self.modalContent =  ko.observable("");
-    self.modalContentRows = ko.observableArray([]);
-    self.templateName = ko.observable();
-
-    self.showModal = function() {
-       $('#info-modal2').modal('show');
-    };
-
-    self.init = function () {
-      // Scrolling the content to the top when the modal opens
-      $('#info-modal2').on('shown.bs.modal', function () {
-          $('#info-content').scrollTop(0);
-      });
-
-      ko.applyBindings(self, $("#info-modal2")[0]);
-    };
-
-}
-
-// **********************************************************************
 
 // Knockout view model for the Neighborhood Map application
 function MapViewModel() {
     var self = this;
 
+    // Main properties
     self.mapLocations = [];
     self.detailsData = {};
     self.curMarker = null;
+    self.map = null;
 
-    self.selectedLocation = ko.observable();
-    self.locationFilter = ko.observable();
-    self.filteredLocations = ko.observableArray();
+    self.appName = ko.observable(LONG_APP_NAME);
+    self.selectedLocation = ko.observable(null);
+    self.locationFilter = ko.observable("");
+    self.filteredLocations = ko.observableArray([]);
 
+    // Modal Window properties
     self.modalHeader = ko.observable("");
-    self.modalContent = ko.observable("");
+    self.modalSubHeader = ko.observable("");
+    self.modalContent =  ko.observable("");
+    self.modalContentRows = ko.observableArray([]);
+    self.templateName = ko.observable("modal-window-text-template");
 
     // Info Window view object
     self.infoWindow = new InfoWindowViewModel();
 
-    // Modal Window view object
-    self.modalWindow = new ModalWindowViewModel();
+    // Do the necessary actions when a location item is clicked
+    self.listClick = function(loc) {
+        self.selectedLocation(loc);
+        self.getDetailsAndShowInfo(loc);
+        self.changeCurMarker(loc);
+    };
+
+    // Show the modal window
+    self.showModal = function() {
+       $('#info-modal2').modal('show');
+    };
 
     // Do the necessary actions if the filter field changes
     self.locationFilter.subscribe(function(newFilter) {
@@ -164,7 +157,8 @@ function MapViewModel() {
         } else {
 
             let locs = ko.utils.arrayFilter(self.mapLocations, function (loc) {
-                return loc.name.toLowerCase().includes(self.locationFilter().toLowerCase());
+                let filterStr = self.locationFilter().toLowerCase();
+                return loc.name.toLowerCase().includes(filterStr);
             });
             self.filteredLocations(locs);
         }
@@ -180,14 +174,15 @@ function MapViewModel() {
         self.curMarker = null;
         self.infoWindow.close();
         for (var i=0; i < self.mapLocations.length; i++) {
-            self.mapLocations[i].marker.setMap(null);
+            self.mapLocations[i].marker.setVisible(false);
             self.mapLocations[i].marker.setIcon(BLUE_MARKER);
             self.mapLocations[i].marker.setAnimation(null);
         }
 
         for (i=0; i < self.filteredLocations().length; i++) {
-            self.filteredLocations()[i].marker.setMap(self.map);
+            self.filteredLocations()[i].marker.setVisible(true);
         }
+        self.infoWindow.close();
 
     };
 
@@ -201,25 +196,15 @@ function MapViewModel() {
         if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
             self.curMarker = newLoc.marker;
             self.map.panTo(newLoc.marker.getPosition());
+            newLoc.marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
             newLoc.marker.setIcon(ORANGE_MARKER);
             newLoc.marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ newLoc.marker.setAnimation(null); }, 4000);
+
         } else {
             self.curMarker = null;
         }
     };
-
-    // Do the necessary actions if the selected location changes
-    self.selectedLocation.subscribe(function(newLoc) {
-        self.changeCurMarker(newLoc);
-
-        if ( (newLoc !== null) && (typeof newLoc !== 'undefined') ) {
-
-            self.getDetailsAndShowInfo(newLoc);
-        } else {
-            self.infoWindow.close();
-        }
-
-    }, self);
 
     // Initialize map locations
     self.initPlaces = function (){
@@ -253,7 +238,8 @@ function MapViewModel() {
         google.maps.event.addListener(marker, 'click', function() {
 
             self.selectedLocation(marker.mapLoc);
-            //self.getDetailsAndShowInfo(marker.mapLoc);
+            self.getDetailsAndShowInfo(marker.mapLoc);
+            self.changeCurMarker(marker.mapLoc);
         });
     };
 
@@ -311,13 +297,13 @@ function MapViewModel() {
             contentRows.push({imgUrl: imgUrl, extUrl: extUrl, imgTitle: "" });
         }
         // Activate the modal window with the results
-        self.modalWindow.modalContentRows([]);
+        self.modalContentRows([]);
 
-        self.modalWindow.templateName("modal-window-images-template");
-        self.modalWindow.modalHeader(self.selectedLocation().name);
-        self.modalWindow.modalSubHeader("Google Places user images");
-        self.modalWindow.modalContentRows(contentRows);
-        self.modalWindow.showModal();
+        self.templateName("modal-window-images-template");
+        self.modalHeader(self.selectedLocation().name);
+        self.modalSubHeader("Google Places user images");
+        self.modalContentRows(contentRows);
+        self.showModal();
 
     };
 
@@ -343,13 +329,13 @@ function MapViewModel() {
                 let content = data.query.pages[pageKey].extract;
 
                 // Activate the modal window with the content
-                self.modalWindow.modalContentRows([]);
+                self.modalContentRows([]);
 
-                self.modalWindow.templateName("modal-window-text-template");
-                self.modalWindow.modalHeader(self.selectedLocation().name);
-                self.modalWindow.modalSubHeader("Wikipedia article");
-                self.modalWindow.modalContent(content);
-                self.modalWindow.showModal();
+                self.templateName("modal-window-text-template");
+                self.modalHeader(self.selectedLocation().name);
+                self.modalSubHeader("Wikipedia article");
+                self.modalContent(content);
+                self.showModal();
 
             },
 
@@ -403,13 +389,13 @@ function MapViewModel() {
                 });
 
                 // Activate the modal window with results
-                self.modalWindow.modalContentRows([]);
+                self.modalContentRows([]);
 
-                self.modalWindow.templateName("modal-window-icons-template");
-                self.modalWindow.modalHeader(self.selectedLocation().name);
-                self.modalWindow.modalSubHeader("Foursquare Venues in this area");
-                self.modalWindow.modalContentRows(contentRows);
-                self.modalWindow.showModal();
+                self.templateName("modal-window-icons-template");
+                self.modalHeader(self.selectedLocation().name);
+                self.modalSubHeader("Foursquare Venues in this area");
+                self.modalContentRows(contentRows);
+                self.showModal();
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -469,13 +455,13 @@ function MapViewModel() {
                 }
 
                 // Activate the modal window with results
-                self.modalWindow.modalContentRows([]);
+                self.modalContentRows([]);
 
-                self.modalWindow.templateName("modal-window-images-template");
-                self.modalWindow.modalHeader(self.selectedLocation().name);
-                self.modalWindow.modalSubHeader("Flickr images");
-                self.modalWindow.modalContentRows(contentRows);
-                self.modalWindow.showModal();
+                self.templateName("modal-window-images-template");
+                self.modalHeader(self.selectedLocation().name);
+                self.modalSubHeader("Flickr images");
+                self.modalContentRows(contentRows);
+                self.showModal();
 
             },
 
@@ -533,11 +519,29 @@ function MapViewModel() {
 
         self.initPlaces();
         self.infoWindow.init();
-        self.modalWindow.init();
+
+        // Scroll to top when the modal opens
+        $('#info-modal2').on('shown.bs.modal', function () {
+            $('#info-content').scrollTop(0);
+        });
+
         console.log("=> Map created");
     };
 }
-// *******************************************************************************************
+
+
+// Update the app name if the browser window is resized
+$(window).on('resize', function(){
+      let win = $(this);
+      if (win.width() <= 320 )
+      {
+        viewModel.appName(SHORT_APP_NAME);
+      } else {
+        viewModel.appName(LONG_APP_NAME);
+      }
+});
+
+// MAP API loading error handler
 function mapOnError() {
     let msg = "Failed to load Google MAP API";
     alert(msg);
@@ -546,4 +550,4 @@ function mapOnError() {
 
 // Initialize the application Knockout model
 var viewModel = new MapViewModel();
-ko.applyBindings(viewModel,$("#left-group")[0]);
+ko.applyBindings(viewModel);
