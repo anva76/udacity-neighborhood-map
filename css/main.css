@@ -6,32 +6,71 @@
 .header-font {
   font-family: 'Saira', sans-serif;
   font-weight: 300;
-  font-size: 50px;
+  font-size: 30px;
+}
+
+.location-list {
+    height: 140px;
+    overflow-y: scroll;
+}
+
+.location-item {
+  padding: 0px 5px 0px 10px;
+  list-style-type: none;
+}
+
+@media screen and (min-width:  768px) {
+    .location-list {
+      height: 100%;
+    }
+
+    .header-font {
+      font-family: 'Saira', sans-serif;
+      font-weight: 300;
+      font-size: 50px;
+    }
+
+    .location-item {
+      padding: 3px 5px 3px 10px;
+      list-style-type: none;
+    }
+
+}
+
+.close-button {
+   position: absolute !important;
+   top: -11px !important;
+   right: -11px !important;
+   z-index: 9001 !important;
+   opacity: 1 !important;
+   border-radius: 15px !important;
+   color: #639999 !important;
+   background-color: white !important;
+   width: 30px !important;
+   height: 30px !important;
+
 }
 
 .info-header {
     color: #f2f2f2;
     background-color: #639999;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 400;
-    padding: 10px;
-    margin-bottom: 5px;
+    padding: 3px 5px 3px 5px;
+    margin-bottom: 3px;
     border-radius: 3px 3px 0 0;
  }
 
-.sub-info-header {
+.info-sub-header {
     font-size: 16px;
 }
 
 .left-control-group {
-
     padding-left: 10px;
 }
 
 .places-img {
-
     padding: 10px;
-
  }
 
 .info-icon {
@@ -42,25 +81,15 @@ div.info-text p, ul, li {
     font-size: 15px;
 }
 
-
-.width100per {
-    width: 100%;
-}
-
 #map {
   overflow: hidden;
   position: relative;
   padding-bottom: 58%;
 }
 
-#location-list {
-   width: 100%;
-}
-
-.app-separator {
-  border-top: 2px solid;
-  /*color: #7d97ad;*/
-  color: #ddd;
+.location-item-selected {
+  background-color: #639999;
+  color: #f2f2f2;
 }
 
 .margin-bottom-5 {
